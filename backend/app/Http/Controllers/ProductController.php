@@ -11,8 +11,13 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $search = $request->input('search');
-        $category = $request->input('category');
+        $validated = $request->validate([
+            'search' => 'nullable|string|max:255',
+            'category' => 'nullable|integer|exists:categories,id',
+        ]);
+
+        $search = $validated['search'] ?? null;
+        $category = $validated['category'] ?? null;
 
         $products = Product::with('category')
             ->when($search !== null && $search !== '', function ($query) use ($search) {
